@@ -122,8 +122,7 @@ class Game:
         self.dragging = True
         self.dragged_piece = piece
         self.drag_from = (y, x)
-        self.board[y][x] = 0
-
+        #self.board[y][x] = 0
         self.legal_moves = self.get_legal_moves(piece, x, y)
 
     def on_left_mouse_up(self):
@@ -141,7 +140,8 @@ class Game:
 
         if (y, x) in self.legal_moves:
             captured = self.board[y][x] if self.board[y][x] != 0 else None
-
+            oy, ox = self.drag_from
+            self.board[oy][ox]
             move = Move(
                 frm=self.drag_from, # (y, x) from where we picked up
                 to=(y, x),
@@ -214,9 +214,10 @@ class Game:
                 color = (149, 83, 59) if (x + y) % 2 == 0 else (251, 209, 185)
                 pygame.draw.rect(self.screen, color, (x * self.TILE, y * self.TILE, self.TILE, self.TILE))
 
+        self.highlight_attacked_squares(self.turn)
         for y, row in enumerate(self.board):
             for x, piece in enumerate(row):
-                if piece != 0:
+                if piece != 0 and (y, x) != self.drag_from:
                     self.screen.blit(self.images[piece], (x * self.TILE, y * self.TILE))
 
         if self.dragging:
@@ -230,6 +231,12 @@ class Game:
 
             mx, my = pygame.mouse.get_pos()
             self.screen.blit(self.images[self.dragged_piece], (mx - self.TILE // 2, my - self.TILE // 2))
+
+    def highlight_attacked_squares(self, color):
+        attacked_squares = self.get_all_attacked_squares(color)
+        if attacked_squares is not None:
+            for y, x in attacked_squares:
+                pygame.draw.rect(self.screen, (10, 200, 10), (x * self.TILE, y * self.TILE, self.TILE, self.TILE))
 
     # ----------------------------
     # Moves
@@ -387,5 +394,6 @@ class Game:
                 unique.append(sq)
         return unique
 
-
+    def check_if_king_is_attacked(self, color, ):
+        pass
 Game()
